@@ -4,6 +4,7 @@ window.i18nData.en = {
     header_title: "CrawlerEye",
     header_subtitle: "The next era of structured data crawling",
     placeholder_url: "https://example.com/sitemap.xml",
+    placeholder_search: "Filter results...",
     btn_explore: "Explore",
     theme_toggle: "Toggle Theme",
     stats_links: "Links found: {count}",
