@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="pt-br" data-theme="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title data-i18n="title">CrawlerEye</title>
+    <link rel="icon" href="/assets/image/favicon.png" type="image/png">
+    <link rel="stylesheet" href="assets/css/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+</head>
+
+<body>
+    <div class="container">
+        <nav>
+            <div class="nav-logo">Crawler</div>
+            <div class="nav-actions">
+                <select id="langSelect">
+                    <option value="pt">PT-BR</option>
+                    <option value="en">EN</option>
+                    <option value="fr">FR</option>
+                    <option value="de">DE</option>
+                </select>
+                <button class="theme-toggle" id="themeToggle" data-i18n-attr="title:theme_toggle">
+                    <svg id="sunIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364-6.364l-.707.707M6.343 17.657l-.707.707m12.728 0l-.707-.707M6.343 6.343l-.707-.707M15 12a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    <svg id="moonIcon" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path></svg>
+                </button>
+            </div>
+        </nav>
+
+        <header>
+            <h1 data-i18n="header_title">CrawlerEye</h1>
+            <p data-i18n="header_subtitle"></p>
+        </header>
+
+        <div id="dashboard" class="dashboard">
+            <div id="cardTotal" class="stat-card clickable-card">
+                <span id="statTotal" class="stat-value">0</span>
+                <span class="stat-label">Total Links</span>
+            </div>
+            <div id="cardOk" class="stat-card clickable-card">
+                <span id="statOk" class="stat-value stat-value-ok">0</span>
+                <span class="stat-label" data-i18n="status_ok"></span>
+            </div>
+            <div id="cardError" class="stat-card clickable-card">
+                <span id="statError" class="stat-value stat-value-error">0</span>
+                <span class="stat-label" data-i18n="status_error"></span>
+            </div>
+            <div id="cardJson" class="stat-card clickable-card">
+                <span id="statLdJson" class="stat-value stat-value-json">0</span>
+                <span class="stat-label">JSON-LD Blocks</span>
+            </div>
+        </div>
+
+        <section class="search-card">
+            <div class="input-group">
+                <input type="text" id="urlInput" data-i18n-attr="placeholder:placeholder_url">
+                <button id="btnAction" data-i18n="btn_explore"></button>
+            </div>
+
+            <div id="searchControls" class="search-controls">
+                <div class="search-input-wrapper">
+                    <input type="text" id="localSearch" class="search-input" data-i18n-attr="placeholder:placeholder_search">
+                </div>
+                <div class="actions">
+                    <button id="btnExportJson" class="btn-export btn-json">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                        JSON
+                    </button>
+                    <button id="btnExportCsv" class="btn-export btn-csv">
+                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                        CSV
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <div id="listaLinks" class="results-container"></div>
+    </div>
+
+    <!-- Traduções -->
+    <script src="assets/js/lang/pt.js"></script>
+    <script src="assets/js/lang/en.js"></script>
+    <script src="assets/js/lang/fr.js"></script>
+    <script src="assets/js/lang/de.js"></script>
+    <!-- App -->
+    <script src="assets/js/app.js"></script>
+</body>
+</html>

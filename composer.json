@@ -1,0 +1,11 @@
+{
+    "name": "nico/crawler-eye",
+    "description": "Professional Web Crawler for JSON-LD extraction",
+    "type": "project",
+    "autoload": {
+        "psr-4": {
+            "App\\": "src/"
+        }
+    },
+    "require": {}
+}

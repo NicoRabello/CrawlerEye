@@ -1,0 +1,11 @@
+# Dependências
+/vendor/
+
+# Arquivos do Sistema
+.DS_Store
+Thumbs.db
+
+# Temporários e Logs
+*.log
+.gemini/
+/plans/
