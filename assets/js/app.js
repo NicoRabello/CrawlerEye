@@ -75,7 +75,7 @@ class LanguageManager {
             el.textContent = text;
         });
 
-        document.querySelectorAll('[data_i18n-attr]').forEach(el => {
+        document.querySelectorAll('[data-i18n-attr]').forEach(el => {
             const attrData = el.getAttribute('data-i18n-attr');
             if (attrData) {
                 const [attr, key] = attrData.split(':');
