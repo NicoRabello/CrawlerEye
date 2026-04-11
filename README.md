@@ -35,7 +35,7 @@ O **CrawlerEye** é um rastreador web de alta performance especializado na extra
 - **i18n Manager:** Sistema de tradução reativo.
 
 ---
-
+To test: https://crawlereye.onrender.com
 ## 🚀 Como Instalar e Rodar
 
 ### Pré-requisitos
