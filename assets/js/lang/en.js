@@ -19,5 +19,19 @@ window.i18nData.en = {
     val_res_title: "Analysis Result",
     val_grave: "Critical",
     val_warning: "Suggestion",
-    val_fix: "How to improve:"
+    val_fix: "How to improve:",
+    
+    val_err_syntax: "JSON Syntax error: {error}",
+    val_err_no_context: "Missing '@context' attribute. Required for JSON-LD.",
+    val_err_bad_context: "Invalid '@context'. Use 'https://schema.org'.",
+    val_err_no_type: "Missing '@type' attribute. Object type must be defined.",
+    val_err_unknown_type: "Type '{type}' is not recognized or not supported for deep validation.",
+    val_err_missing_field: "Field '{field}' is required for type '{type}'.",
+    val_err_invalid_url: "Invalid URL format in '{field}'.",
+    val_err_invalid_type: "Field '{field}' should be of type {expected}.",
+    val_err_offers_missing: "Commercial products require an 'offers' field.",
+    val_err_price_missing: "Field 'price' is required inside 'offers'.",
+    val_err_currency_missing: "Field 'priceCurrency' is required inside 'offers'.",
+    val_err_address_missing: "Incomplete address. Street, city, and country are required.",
+    val_success_valid: "Valid {type} JSON-LD. All required fields are present."
 };

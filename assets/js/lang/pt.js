@@ -20,5 +20,18 @@ window.i18nData.pt = {
     val_res_title: "Resultado da Análise",
     val_grave: "Grave",
     val_warning: "Sugestão",
-    val_fix: "Como melhorar:"
+    val_fix: "Como melhorar:",
+    val_err_syntax: "Erro de sintaxe JSON: {error}",
+    val_err_no_context: "Atributo '@context' ausente. É obrigatório para JSON-LD.",
+    val_err_bad_context: "Atributo '@context' inválido. Use 'https://schema.org'.",
+    val_err_no_type: "Atributo '@type' ausente. Defina o tipo do objeto.",
+    val_err_unknown_type: "Tipo '{type}' não é reconhecido ou não suportado para validação profunda.",
+    val_err_missing_field: "O campo '{field}' é obrigatório para o tipo '{type}'.",
+    val_err_invalid_url: "O formato da URL no campo '{field}' é inválido.",
+    val_err_invalid_type: "O campo '{field}' deveria ser do tipo {expected}.",
+    val_err_offers_missing: "Produtos comerciais exigem o campo 'offers'.",
+    val_err_price_missing: "O campo 'price' é obrigatório dentro de 'offers'.",
+    val_err_currency_missing: "O campo 'priceCurrency' é obrigatório dentro de 'offers'.",
+    val_err_address_missing: "Endereço incompleto. Campos rua, cidade e país são obrigatórios.",
+    val_success_valid: "JSON-LD de {type} válido. Todos os campos obrigatórios estão presentes."
 };
