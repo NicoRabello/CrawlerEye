@@ -57,11 +57,6 @@ class LanguageManager {
         window.dispatchEvent(new Event('languageChanged'));
     }
 
-    setDynamicValue(key, value) {
-        this.dynamicValues[key] = value;
-        this.apply();
-    }
-
     apply() {
         const data = window.i18nData[this.lang];
         if (!data) return;
@@ -94,15 +89,52 @@ class LanguageManager {
     }
 }
 
+class FeedbackManager {
+    constructor() {
+        this.container = document.getElementById('feedbackContainer');
+    }
 
+    show(type, message, title = '') {
+        if (!this.container) return;
+        
+        const card = document.createElement('div');
+        card.className = `feedback-card ${type}`;
+        
+        const icon = {
+            success: '✓',
+            warning: '⚠',
+            error: '✖'
+        }[type] || 'ℹ';
+
+        card.innerHTML = `
+            <div class="feedback-icon">${icon}</div>
+            <div class="feedback-content">
+                ${title ? `<div class="feedback-title">${title}</div>` : ''}
+                <div class="feedback-message">${message}</div>
+            </div>
+        `;
+
+        this.container.appendChild(card);
+        
+        if (type !== 'error') {
+            setTimeout(() => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(-20px)';
+                setTimeout(() => card.remove(), 300);
+            }, 5000);
+        }
+    }
+
+    clear() {
+        if (this.container) this.container.innerHTML = '';
+    }
+}
 
 class CrawlerUI {
     constructor() {
         this.urlInput = document.getElementById('urlInput');
         this.btnAction = document.getElementById('btnAction');
         this.lista = document.getElementById('listaLinks');
-        this.dashboard = document.getElementById('dashboard');
-        this.searchControls = document.getElementById('searchControls');
         this.localSearch = document.getElementById('localSearch');
         this.btnJson = document.getElementById('btnExportJson');
         this.btnCsv = document.getElementById('btnExportCsv');
@@ -111,11 +143,10 @@ class CrawlerUI {
         this.cardOk = document.getElementById('cardOk');
         this.cardError = document.getElementById('cardError');
         this.cardJson = document.getElementById('cardJson');
-        
-        this.tabCrawlerBtn = document.getElementById('tabCrawler');
-        this.tabValidatorBtn = document.getElementById('tabValidator');
-        this.contentCrawler = document.getElementById('contentCrawler');
-        this.contentValidator = document.getElementById('contentValidator');
+
+        this.jsonInput = document.getElementById('jsonInput');
+        this.btnValidate = document.getElementById('btnValidate');
+        this.validationResult = document.getElementById('validationResult');
         
         this.eventSource = null;
         this.allResults = []; 
@@ -123,13 +154,13 @@ class CrawlerUI {
         this.currentFilter = 'all';
 
         this.init();
-        this.setupTabListeners();
-        // Define o estado inicial para a aba do Crawler
-        this.switchTab('crawler');
     }
 
     init() {
-        if (this.btnAction) this.btnAction.addEventListener('click', () => this.start());
+        document.getElementById('tabCrawler').addEventListener('click', (e) => this.switchTab(e, 'crawler'));
+        document.getElementById('tabValidator').addEventListener('click', (e) => this.switchTab(e, 'validator'));
+        if (this.btnAction) this.btnAction.addEventListener('click', () => this.startCrawler());
+        if (this.btnValidate) this.btnValidate.addEventListener('click', () => this.validateJson());
         if (this.localSearch) this.localSearch.addEventListener('input', () => this.applyFilters());
         if (this.btnJson) this.btnJson.addEventListener('click', () => this.exportJson());
         if (this.btnCsv) this.btnCsv.addEventListener('click', () => this.exportCsv());
@@ -139,61 +170,20 @@ class CrawlerUI {
         if (this.cardError) this.cardError.addEventListener('click', () => this.setFilter('error'));
         if (this.cardJson) this.cardJson.addEventListener('click', () => this.setFilter('hasJson'));
 
-        this.dashboard.style.display = 'grid';
-        this.searchControls.style.display = 'flex';
-
         window.addEventListener('languageChanged', () => this.refreshList());
     }
 
-    setupTabListeners() {
-        // Adiciona listener APENAS para a aba do Crawler
-        if (this.tabCrawlerBtn && this.contentCrawler) {
-            this.tabCrawlerBtn.addEventListener('click', () => this.switchTab('crawler'));
-            console.log('Crawler tab listener attached.');
-        } else {
-            console.warn('Crawler tab elements not found.');
-        }
-
-        // A aba do Validador NÃO terá seu listener ativo, e seu conteúdo permanece oculto pelo CSS.
-        if (this.tabValidatorBtn) {
-            console.log('Validator tab button found, but its listener is intentionally not set to keep it inactive.');
-            // Opcional: Desabilitar visualmente se desejado, mas o CSS já o mantém oculto.
-        }
-        if (this.contentValidator) {
-            this.contentValidator.style.display = 'none'; // Garante que esteja oculto por padrão
-        }
-    }
-
-    switchTab(tabId) {
-        console.log(`Switching to tab: ${tabId}`);
-
-        document.querySelectorAll('.tab-btn').forEach(btn => {
-            btn.classList.remove('active');
-            console.log(`Removed active class from: ${btn.id}`);
-        });
-        document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
-
-        const activeContent = document.getElementById(`content${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`);
-        const activeBtn = document.getElementById(`tab${tabId.charAt(0).toUpperCase() + tabId.slice(1)}`);
+    switchTab(e, tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
         
-        if (activeContent) {
-            activeContent.classList.add('active');
-            console.log(`Added 'active' class to content: ${activeContent.id}`);
-        } else {
-            console.error(`Content element not found for tab: ${tabId}`);
-        }
-        if (activeBtn) {
-            activeBtn.classList.add('active');
-            console.log(`Added 'active' class to button: ${activeBtn.id}`);
-        } else {
-            console.error(`Button element not found for tab: ${tabId}`);
-        }
+        e.target.classList.add('active');
+        document.getElementById(`content${tab.charAt(0).toUpperCase() + tab.slice(1)}`).classList.add('active');
     }
 
     setFilter(type) {
         this.currentFilter = type;
-        const cards = [this.cardTotal, this.cardOk, this.cardError, this.cardJson];
-        cards.forEach(c => { if (c) c.classList.remove('card-active'); });
+        [this.cardTotal, this.cardOk, this.cardError, this.cardJson].forEach(c => c.classList.remove('active'));
         
         const activeCard = {
             'all': this.cardTotal,
@@ -224,39 +214,68 @@ class CrawlerUI {
         filtered.forEach(link => this.renderLink(link));
     }
 
-    start() {
+    async startCrawler() {
         let url = this.urlInput.value.trim().replace(/\s/g, '');
-        if (!url) return;
+        if (!url) {
+            window.feedback.show('warning', window.i18n.get('conn_error'));
+            return;
+        }
+
+        window.feedback.clear();
         this.urlInput.value = url;
         this.lista.innerHTML = '';
         this.allResults = [];
         this.resetStats();
         this.setFilter('all');
-        
-        this.searchControls.style.display = 'flex';
+        this.btnAction.disabled = true;
 
         if (this.eventSource) this.eventSource.close();
-        this.eventSource = new EventSource(`crawler.php?url=${encodeURIComponent(url)}`);
         
-        this.eventSource.onmessage = (e) => {
-            const data = JSON.parse(e.data);
-            if (data.status === 'iniciando') {
-                this.stats.total = data.total;
-                this.updateDashboard();
-            }
-            if (data.status === 'update') {
-                this.allResults.push(data.link);
-                this.updateStats(data.link);
-                if (this.shouldShow(data.link)) {
-                    this.renderLink(data.link);
+        try {
+            this.eventSource = new EventSource(`crawler.php?url=${encodeURIComponent(url)}`);
+            
+            this.eventSource.onmessage = (e) => {
+                const data = JSON.parse(e.data);
+                
+                if (data.status === 'erro') {
+                    window.feedback.show('error', data.mensagem);
+                    this.stopCrawler();
+                    return;
                 }
-            }
-            if (data.status === 'concluido') {
-                this.eventSource.close();
-                this.stats.total = this.allResults.length;
-                this.updateDashboard();
-            }
-        };
+
+                if (data.status === 'iniciando') {
+                    this.stats.total = data.total;
+                    this.updateDashboard();
+                }
+
+                if (data.status === 'update') {
+                    this.allResults.push(data.link);
+                    this.updateStats(data.link);
+                    if (this.shouldShow(data.link)) {
+                        this.renderLink(data.link);
+                    }
+                }
+
+                if (data.status === 'concluido') {
+                    this.stopCrawler();
+                    window.feedback.show('success', window.i18n.get('status_ok'), `Crawler: ${this.allResults.length} links`);
+                }
+            };
+
+            this.eventSource.onerror = () => {
+                window.feedback.show('error', window.i18n.get('conn_error'));
+                this.stopCrawler();
+            };
+
+        } catch (err) {
+            window.feedback.show('error', err.message);
+            this.stopCrawler();
+        }
+    }
+
+    stopCrawler() {
+        if (this.eventSource) this.eventSource.close();
+        this.btnAction.disabled = false;
     }
 
     shouldShow(link) {
@@ -271,17 +290,16 @@ class CrawlerUI {
         return matchesSearch && matchesStatus;
     }
 
-    // --- Validador ---
     async validateJson() {
         const jsonCode = this.jsonInput.value.trim();
         if (!jsonCode) {
-            alert(i18n.get('validation_error_empty'));
+            window.feedback.show('warning', 'Cole algum código JSON para validar.');
             return;
         }
 
         this.btnValidate.disabled = true;
-        if (this.validationResult) this.validationResult.style.display = 'block';
-        this.validationResult.innerHTML = '<div class="issue-card"><div class="issue-title">Validando...</div></div>';
+        this.validationResult.innerHTML = '';
+        window.feedback.clear();
 
         try {
             const response = await fetch('validator.php', {
@@ -294,11 +312,18 @@ class CrawlerUI {
 
             if (data.status === 'sucesso' && data.analysis) {
                 this.displayValidationResults(data.analysis);
+                if (data.analysis.isValidJson && data.analysis.issues.length === 0) {
+                    window.feedback.show('success', 'JSON-LD válido!');
+                } else if (data.analysis.isValidJson) {
+                    window.feedback.show('warning', 'JSON válido, mas com melhorias sugeridas.');
+                } else {
+                    window.feedback.show('error', 'JSON inválido.');
+                }
             } else {
-                this.displayValidationError(data.mensagem || 'Erro desconhecido ao validar.');
+                window.feedback.show('error', data.mensagem || 'Erro desconhecido.');
             }
         } catch (error) {
-            this.displayValidationError('Erro de conexão com o servidor do validador.');
+            window.feedback.show('error', 'Erro de conexão com o servidor.');
         } finally {
             this.btnValidate.disabled = false;
         }
@@ -308,44 +333,33 @@ class CrawlerUI {
         this.validationResult.innerHTML = '';
         const title = document.createElement('h3');
         title.className = 'validation-title';
-        title.setAttribute('data-i18n', 'val_res_title');
-        title.textContent = i18n.get('val_res_title');
-        title.style.marginBottom = '1rem';
-        title.style.fontWeight = 'bold';
+        title.textContent = `${window.i18n.get('val_res_title')} (${analysis.type})`;
+        title.style.marginBottom = '1.5rem';
         this.validationResult.appendChild(title);
 
-        if (!analysis.isValidJson) {
-            this.showIssue('grave', analysis.issues[0].message, analysis.issues[0].fix);
-            return;
-        }
-
         if (analysis.issues.length === 0) {
-            const successMsg = document.createElement('p');
-            successMsg.textContent = 'JSON-LD válido e bem estruturado!';
-            successMsg.style.color = 'var(--success)';
+            const successMsg = document.createElement('div');
+            successMsg.className = 'issue-card';
+            successMsg.style.borderColor = 'var(--success)';
+            successMsg.textContent = window.i18n.get('val_success_valid', { type: analysis.type });
             this.validationResult.appendChild(successMsg);
         } else {
             analysis.issues.forEach(issue => {
-                this.showIssue(issue.severity, issue.message, issue.fix);
+                const issueDiv = document.createElement('div');
+                issueDiv.className = `issue-card issue-${issue.severity}`;
+                const message = window.i18n.get(issue.key, issue.params);
+                const severityLabel = window.i18n.get('val_' + issue.severity).toUpperCase();
+
+                issueDiv.innerHTML = `
+                    <strong class="issue-title">${severityLabel}:</strong> 
+                    ${message}
+                    <div class="issue-fix"><strong>${window.i18n.get('val_fix')}</strong> ${issue.fix}</div>
+                `;
+                this.validationResult.appendChild(issueDiv);
             });
         }
     }
 
-    showIssue(severity, message, fix) {
-        const issueDiv = document.createElement('div');
-        issueDiv.className = `issue-card issue-${severity}`;
-        issueDiv.innerHTML = `
-            <strong class="issue-title">${i18n.get('val_' + severity).toUpperCase()}:</strong> ${message}
-            <div class="issue-fix"><strong>${i18n.get('val_fix')}</strong> ${fix}</div>
-        `;
-        this.validationResult.appendChild(issueDiv);
-    }
-
-    displayValidationError(message) {
-        this.validationResult.innerHTML = `<div class="issue-card issue-grave"><strong class="issue-title">ERRO:</strong> ${message}</div>`;
-    }
-
-    // --- Métodos de Exportação e Crawler (mantidos) ---
     resetStats() {
         this.stats = { total: 0, ok: 0, error: 0, ldjson: 0 };
         this.updateDashboard();
@@ -371,7 +385,6 @@ class CrawlerUI {
     }
 
     renderLink(link) {
-        const id = 'id-' + Math.random().toString(36).substr(2, 9);
         const div = document.createElement('div');
         div.className = 'result-item';
         
@@ -382,17 +395,19 @@ class CrawlerUI {
             details.style.display = details.style.display === 'block' ? 'none' : 'block';
         });
 
-        const jsonText = link.ldjson.length > 0 ? `${i18n.get('json_found')} (${link.ldjson.length})` : '';
+        const jsonText = link.ldjson.length > 0 ? `${window.i18n.get('json_found')} (${link.ldjson.length})` : '';
         
         header.innerHTML = `
-            <div class="url-text"><span class="status-dot ${link.ok ? 'dot-ok' : 'dot-error'}"></span>${link.url}</div>
+            <div class="url-text">
+                <span class="status-dot" style="width:10px; height:10px; border-radius:50%; background:${link.ok ? 'var(--success)' : 'var(--error)'}"></span>
+                ${link.url}
+            </div>
             <div class="result-item-header-info">${jsonText}</div>
         `;
 
         const details = document.createElement('div');
-        details.id = id;
         details.style.display = 'none';
-        details.innerHTML = `<pre>${link.ldjson.length > 0 ? JSON.stringify(link.ldjson, null, 2) : i18n.get('no_data')}</pre>`;
+        details.innerHTML = `<pre>${link.ldjson.length > 0 ? JSON.stringify(link.ldjson, null, 2) : window.i18n.get('no_data')}</pre>`;
 
         div.appendChild(header);
         div.appendChild(details);
@@ -401,7 +416,7 @@ class CrawlerUI {
 
     exportJson() {
         const blob = new Blob([JSON.stringify(this.allResults, null, 2)], { type: 'application/json' });
-        this.download(blob, 'crawler-results.json');
+        this.download(blob, `crawler-results-${new Date().getTime()}.json`);
     }
 
     exportCsv() {
@@ -409,7 +424,7 @@ class CrawlerUI {
         this.allResults.forEach(r => rows.push([r.url, r.status, r.ok, r.ldjson.length]));
         const csvContent = rows.map(e => e.join(",")).join("\n");
         const blob = new Blob([csvContent], { type: 'text/csv' });
-        this.download(blob, 'crawler-results.csv');
+        this.download(blob, `crawler-results-${new Date().getTime()}.csv`);
     }
 
     download(blob, filename) {
@@ -418,6 +433,7 @@ class CrawlerUI {
         a.href = url;
         a.download = filename;
         a.click();
+        URL.revokeObjectURL(url);
     }
 
     refreshList() {
@@ -428,6 +444,6 @@ class CrawlerUI {
 document.addEventListener('DOMContentLoaded', () => {
     window.i18n = new LanguageManager();
     window.themeManager = new ThemeManager();
+    window.feedback = new FeedbackManager();
     window.crawler = new CrawlerUI();
 });
-

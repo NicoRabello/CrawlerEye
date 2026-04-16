@@ -32,49 +32,68 @@
             <p data-i18n="header_subtitle"></p>
         </header>
 
-        <div id="dashboard" class="dashboard">
-            <div id="cardTotal" class="stat-card clickable-card">
-                <span id="statTotal" class="stat-value">0</span>
-                <span class="stat-label">Total Links</span>
-            </div>
-            <div id="cardOk" class="stat-card clickable-card">
-                <span id="statOk" class="stat-value stat-value-ok">0</span>
-                <span class="stat-label" data-i18n="status_ok"></span>
-            </div>
-            <div id="cardError" class="stat-card clickable-card">
-                <span id="statError" class="stat-value stat-value-error">0</span>
-                <span class="stat-label" data-i18n="status_error"></span>
-            </div>
-            <div id="cardJson" class="stat-card clickable-card">
-                <span id="statLdJson" class="stat-value stat-value-json">0</span>
-                <span class="stat-label">JSON-LD Blocks</span>
-            </div>
+        <div class="tabs">
+            <button class="tab-btn active" id="tabCrawler" data-i18n="tab_crawler"></button>
+            <button class="tab-btn" id="tabValidator" data-i18n="tab_validator"></button>
         </div>
 
-        <section class="search-card">
-            <div class="input-group">
-                <input type="text" id="urlInput" data-i18n-attr="placeholder:placeholder_url">
-                <button id="btnAction" data-i18n="btn_explore"></button>
+        <div id="feedbackContainer" class="feedback-container"></div>
+
+        <main class="tab-content active" id="contentCrawler">
+            <div id="dashboard" class="dashboard">
+                <div id="cardTotal" class="stat-card clickable-card">
+                    <span id="statTotal" class="stat-value">0</span>
+                    <span class="stat-label">Total Links</span>
+                </div>
+                <div id="cardOk" class="stat-card clickable-card">
+                    <span id="statOk" class="stat-value stat-value-ok">0</span>
+                    <span class="stat-label" data-i18n="status_ok"></span>
+                </div>
+                <div id="cardError" class="stat-card clickable-card">
+                    <span id="statError" class="stat-value stat-value-error">0</span>
+                    <span class="stat-label" data-i18n="status_error"></span>
+                </div>
+                <div id="cardJson" class="stat-card clickable-card">
+                    <span id="statLdJson" class="stat-value stat-value-json">0</span>
+                    <span class="stat-label">JSON-LD Blocks</span>
+                </div>
             </div>
 
-            <div id="searchControls" class="search-controls">
-                <div class="search-input-wrapper">
-                    <input type="text" id="localSearch" class="search-input" data-i18n-attr="placeholder:placeholder_search">
+            <section class="search-card">
+                <div class="input-group">
+                    <input type="text" id="urlInput" data-i18n-attr="placeholder:placeholder_url">
+                    <button id="btnAction" data-i18n="btn_explore"></button>
                 </div>
-                <div class="actions">
-                    <button id="btnExportJson" class="btn-export btn-json">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
-                        JSON
-                    </button>
-                    <button id="btnExportCsv" class="btn-export btn-csv">
-                        <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                        CSV
-                    </button>
-                </div>
-            </div>
-        </section>
 
-        <div id="listaLinks" class="results-container"></div>
+                <div id="searchControls" class="search-controls">
+                    <div class="search-input-wrapper">
+                        <input type="text" id="localSearch" class="search-input" data-i18n-attr="placeholder:placeholder_search">
+                    </div>
+                    <div class="actions">
+                        <button id="btnExportJson" class="btn-export btn-json">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                            JSON
+                        </button>
+                        <button id="btnExportCsv" class="btn-export btn-csv">
+                            <svg fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                            CSV
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <div id="listaLinks" class="results-container"></div>
+        </main>
+
+        <main class="tab-content" id="contentValidator">
+            <section class="search-card">
+                <div class="validator-wrapper">
+                    <textarea id="jsonInput" class="validator-textarea" data-i18n-attr="placeholder:validator_placeholder"></textarea>
+                    <button id="btnValidate" class="btn-primary" data-i18n="btn_validate"></button>
+                </div>
+            </section>
+            <div id="validationResult" class="results-container"></div>
+        </main>
     </div>
 
     <!-- Traduções -->
